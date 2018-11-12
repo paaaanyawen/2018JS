@@ -7,7 +7,74 @@
     <title>Document</title>
 </head>
 <body>
-    <h1>1234</h1>
-    <h2>QQQQQQ</h2>
+    <select name="" id="country">
+        <option value="">請選擇地區</option>
+      </select>
+      <select name="" id="InformDesc_">
+        <option value="">請選擇類型</option>
+      </select>
+      <input type="button" id="search" value="搜尋">
+      <h3>
+        <span class="area">全部</span>
+        <span class="type">違規停車</span>
+        有 
+        <em class="count"></em> 處</h3>
+      <ul class="situation">
+     
+      </ul>
+      <script>
+        var xhr = new XMLHttpRequest();
+        
+        xhr.open('get',"https://work1999.kcg.gov.tw/open1999/ServiceRequestsQuery.asmx/ServiceRequestsQuery",true);
+        xhr.send();
+
+        xhr.onload = function(){
+            var str = ''
+            var data = JSON.parse(xhr.responseText);
+
+            var _type={};
+            for(var i=0;i<data.length;i++){
+            var d=data[i]["InformDesc_"];
+            _type[d]=1;
+            
+            }
+            var type=Object.keys(_type)
+
+            for(var i=0;i<type.length;i++){
+            document.getElementById('InformDesc_').innerHTML += '<option>' + type[i] + '</option>';
+            }
+
+            var districts = {};
+            for(var i=0;i<data.length;i++){
+                var d = data[i]["ZipName_"];
+                districts[d] =1;
+                }
+                var country = Object.keys(districts);
+                for(var i=0;i<country.length;i++){
+                    document.getElementById('country').innerHTML += '<option>' + country[i] + '</option>';
+                }
+
+                var send=document.getElementById('search');
+                var counValue=document.getElementById('country');
+                var informValue=document.getElementById('InformDesc_');
+                send.addEventListener('click',function(e){
+                var _counValue=counValue.value;
+                var _informValue=informValue.value;
+                var str='';
+                var count=0;
+                //console.log(data.length);
+                for(var i=0;i<data.length;i++){                 
+                    if(data[i]['ZipName_'] == _counValue && data[i]['InformDesc_'] == _informValue){
+                        count++;   
+                        str+="<li><h4>地點："+data[i]['ZipName_']+"，"+data[i]['address_']+"</h4></li><h5>報案狀況："+data[i]['BeforeDesc_']+"</h5>";
+                        //console.log(count);
+                    }
+                }
+                document.querySelector(".situation").innerHTML=str;
+                document.querySelector(".type").innerHTML=_informValue;
+                document.querySelector(".count").innerHTML=count;
+            })
+        };  
+        </script>
 </body>
 </html>
